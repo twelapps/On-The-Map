@@ -12,10 +12,22 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    
+    // Define and initialize the Shared Model here! Can be accessed from anywhere inside the project.
+//    var myUserInfo            = UdacityUserInfo(userID: UdacityDBClient.Constants.emptyString,
+//                                              password: UdacityDBClient.Constants.emptyString,
+//                                            accountKey: UdacityDBClient.Constants.emptyString)
+    var myUserInfo            = UdacityUserInfo()
+    var allUdacityStudentInfo = [UdacityStudentInfo]()
+    
+    let defaults              = NSUserDefaults.standardUserDefaults()
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        
+        // Retrieve userdata saved to disk during previous sessions from disk
+        self.restoreData()
+        
         return true
     }
 
@@ -27,6 +39,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        
+        // User data was already saved. Now enforce synchronization with the user defaults (= write to disk) at this point.
+        defaults.synchronize()
     }
 
     func applicationWillEnterForeground(application: UIApplication) {
@@ -40,6 +55,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
+    
+    func restoreData() {
+        
+        if defaults.dataForKey(UdacityDBClient.Constants.myUserInfoDataKey) != nil {
+            myUserInfo = NSKeyedUnarchiver.unarchiveObjectWithData(defaults.dataForKey(UdacityDBClient.Constants.myUserInfoDataKey)!) as! UdacityUserInfo
+        }
+        
+    }
+
 
 
 }
